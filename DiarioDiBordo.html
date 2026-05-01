@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Writer</title>
+    <style>
+        :root { --bg: #f8f9fa; --text: #212529; --accent: #007bff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+               background: var(--bg); color: var(--text); display: flex; 
+               align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; 
+                     box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 100%; max-width: 400px; }
+        .tag-label { font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        h1 { font-size: 1.4rem; line-height: 1.4; margin: 0; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .btn-reload { margin-top: 25px; background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 50px; cursor: pointer; color: #888; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span id="tipo-lista" class="tag-label">Prompt</span>
+        <h1 id="testo-prompt">Scegli una categoria...</h1>
+        <button class="btn-reload" onclick="location.reload()">Genera un altro</button>
+    </div>
+
+    <script>
+        const database = {
+            incipit: ["Era l'ultimo treno della notte...", "La lettera non era firmata, ma sapeva chi l'aveva scritta.", "Nessuno si accorse della sua scomparsa per tre giorni."],
+            vincoli: ["Non puoi usare la lettera 'e' per i primi due paragrafi.", "Deve esserci un temporale improvviso.", "Un personaggio deve mentire su qualcosa di banale."],
+            personaggi: ["Un detective che ha paura del buio.", "Una fioraia che soffre di allergia ai polline.", "Un bambino che sostiene di vedere il futuro nei riflessi delle pozzanghere."],
+            ambientazioni: ["Una stazione spaziale abbandonata.", "Una biblioteca dove i libri sussurrano se non vengono letti.", "Una Venezia sommersa dove ci si sposta solo in sottomarino."]
+        };
+
+        // Estrae il parametro dalla URL (es: ?lista=incipit)
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoria = urlParams.get('lista');
+
+        if (database[categoria]) {
+            const opzioni = database[categoria];
+            const casuale = opzioni[Math.floor(Math.random() * opzioni.length)];
+            document.getElementById('tipo-lista').innerText = "Lista: " + categoria;
+            document.getElementById('testo-prompt').innerText = casuale;
+        } else {
+            document.getElementById('testo-prompt').innerText = "Avvicina un tag NFC valido!";
+        }
+    </script>
+</body>
+</html>
