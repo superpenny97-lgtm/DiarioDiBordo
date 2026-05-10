@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Writer</title>
     <title>Arcani della Scrittura</title>
-    <style>
+<style>
+        :root { --bg: #f8f9fa; --text: #212529; --accent: #007bff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+               background: var(--bg); color: var(--text); display: flex; 
+               align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; 
+                     box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 100%; max-width: 400px; }
+        .tag-label { font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        h1 { font-size: 1.4rem; line-height: 1.4; margin: 0; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .btn-reload { margin-top: 25px; background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 50px; cursor: pointer; color: #888; font-size: 0.9rem; }
         :root { 
             --spade: #4a5568; --bastoni: #c05621; 
             --pentacoli: #2f855a; --coppe: #9b2c2c; 
@@ -26,17 +34,24 @@
         .theme-bastoni { color: var(--bastoni); }
         .theme-pentacoli { color: var(--pentacoli); }
         .theme-coppe { color: var(--coppe); }
-    </style>
+</style>
 </head>
 <body>
+    <div class="container">
+        <span id="tipo-lista" class="tag-label">Prompt</span>
+        <h1 id="testo-prompt">Scegli una categoria...</h1>
     <div class="card">
         <span id="tipo-lista" class="suit-label">Pesca un Tag</span>
         <h1 id="testo-prompt">Avvicina il tuo tag NFC per iniziare la sessione.</h1>
-        <button class="btn-reload" onclick="location.reload()">Genera un altro</button>
-    </div>
+<button class="btn-reload" onclick="location.reload()">Genera un altro</button>
+</div>
 
-    <script>
-        const database = {
+<script>
+const database = {
+            incipit: ["Era l'ultimo treno della notte...", "La lettera non era firmata, ma sapeva chi l'aveva scritta.", "Nessuno si accorse della sua scomparsa per tre giorni."],
+            vincoli: ["Non puoi usare la lettera 'e' per i primi due paragrafi.", "Deve esserci un temporale improvviso.", "Un personaggio deve mentire su qualcosa di banale."],
+            personaggi: ["Un detective che ha paura del buio.", "Una fioraia che soffre di allergia ai polline.", "Un bambino che sostiene di vedere il futuro nei riflessi delle pozzanghere."],
+            ambientazioni: ["Una stazione spaziale abbandonata.", "Una biblioteca dove i libri sussurrano se non vengono letti.", "Una Venezia sommersa dove ci si sposta solo in sottomarino."]
             spade: [
                 "Una lettera mai spedita viene ritrovata dal destinatario sbagliato.",
                 "Il momento esatto in cui il protagonista capisce di aver perso una battaglia importante.",
@@ -47,10 +62,14 @@
                 "Un oggetto rotto che non può più essere riparato, metafora di un legame.",
                 "La notizia che nessuno voleva ricevere arriva durante una festa.",
                 "Un addio dato senza parole, solo attraverso un gesto minimo.",
-                "Il peso di una responsabilità che non si è mai desiderata."
+                "Il peso di una responsabilità che non si è mai desiderata.",
+                "Qualcuno è intrappolato.",
+                "Un cattivo presagio appare in sogno.",
+                "Un terribile incidente da cui è impossible riprendersi fa perdere al tuo personaggio perde un arto."
             ],
             bastoni: [
                 "Una partenza improvvisa nel cuore della notte, senza bagagli.",
+                "Un testimone di un crimine scompare improvvisamente.",
                 "La decisione di distruggere qualcosa per poter ricominciare da zero.",
                 "Una corsa contro il tempo per fermare un evento inevitabile.",
                 "Un confronto acceso che cambia radicalmente le gerarchie in gioco.",
@@ -59,7 +78,8 @@
                 "L'energia sprigionata da una rabbia che è rimasta repressa troppo a lungo.",
                 "Il momento in cui un piano prudente viene abbandonato per un atto di follia.",
                 "Un movimento collettivo che travolge le intenzioni del singolo.",
-                "L'adrenalina di scoprire un talento che non si sapeva di avere."
+                "L'adrenalina di scoprire un talento che non si sapeva di avere.",
+                "Sei costrett* ad andare non volevi."
             ],
             pentacoli: [
                 "Il ritrovamento di un oggetto smarrito che riaccende una speranza.",
@@ -70,8 +90,11 @@
                 "Una promessa fatta a se stessi che viene finalmente mantenuta.",
                 "La scoperta di una risorsa nascosta nel proprio giardino (o nel proprio animo).",
                 "Un successo meritato che arriva dopo un lungo periodo di dubbi.",
+                "Qualcuno riceve qualcosa di inaspettato.",
                 "L'incontro con una guida o un mentore che offre la parola giusta.",
-                "Un banchetto o una celebrazione per un piccolo, grande traguardo raggiunto."
+                "Un banchetto o una celebrazione per un piccolo, grande traguardo raggiunto.",
+                "Un buon presagio appare in sogno.",
+                ""
             ],
             coppe: [
                 "Un brindisi fatto tra persone che sanno di non rivedersi più.",
@@ -81,24 +104,30 @@
                 "Una situazione tragica che diventa improvvisamente comica per un assurdo dettaglio.",
                 "Due nemici che si trovano a ridere della stessa identica cosa.",
                 "La nostalgia per un futuro che non si è mai verificato.",
+                "Qualcuno che non si vedeva da tempo ricompare nel cuore della notte.",
                 "Un gioco d'infanzia ripreso in età adulta con conseguenze inaspettate.",
                 "Una conversazione dove il sottotesto ironico dice più delle parole.",
-                "Celebrare una sconfitta con lo stesso entusiasmo di una vittoria."
+                "Celebrare una sconfitta con lo stesso entusiasmo di una vittoria.",
+                "Uno sguardo inatteso fa scattare una scintilla...",
+                "Una mancanza di rispetto crea una crepa nei rapporti."
             ]
-        };
+};
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const categoria = urlParams.get('lista');
+        // Estrae il parametro dalla URL (es: ?lista=incipit)
+const urlParams = new URLSearchParams(window.location.search);
+const categoria = urlParams.get('lista');
 
-        if (database[categoria]) {
-            const opzioni = database[categoria];
-            const casuale = opzioni[Math.floor(Math.random() * opzioni.length)];
+if (database[categoria]) {
+const opzioni = database[categoria];
+const casuale = opzioni[Math.floor(Math.random() * opzioni.length)];
+            document.getElementById('tipo-lista').innerText = "Lista: " + categoria;
             const etichetta = document.getElementById('tipo-lista');
             
             etichetta.innerText = categoria;
             etichetta.classList.add('theme-' + categoria);
-            document.getElementById('testo-prompt').innerText = casuale;
-        }
-    </script>
+document.getElementById('testo-prompt').innerText = casuale;
+        } else {
+            document.getElementById('testo-prompt').innerText = "Avvicina un tag NFC valido!";
+}
+</script>
 </body>
-</html>
